@@ -1,41 +1,30 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import Countries from './components/Countries';
 
 function App() {
-  const [countries, setCountries] = useState([])
-  const [searchName, setSearchName] = useState("")
-  const [timerId, setTimerId] = useState(0)
+  const [countries, setCountries] = useState(null)
+  const [searchString, setSearchString] = useState("")
+
+  useEffect(() => console.log(countries), [countries])
+  //console.log(countries)
+  console.log(searchString)
 
   useEffect(() => {
-    console.log(timerId)
-  }, [timerId])
-
-  useEffect(() => {
-    clearTimeout(timerId)
-    
-    setTimerId(setTimeout(() => {
-      if (searchName.length > 0) {
-        fetch(`https://restcountries.com/v3.1/name/${searchName}`)
-          .then(res => res.json())
-          .then(data => setCountries(data))
-      } else {
-        fetch("https://restcountries.com/v3.1/all")
-          .then(res => res.json())
-          .then(data => setCountries(data))
-      } 
-    }, 2000))
-  }, [searchName])
-
-  /* useEffect(() => {
+    console.log("running fetch")
     fetch("https://restcountries.com/v3.1/all")
       .then(res => res.json())
-      .then(data => setTimeout(() => setCountries(data), 1000))
-  }, []) */
+      .then(data => setCountries(data))
+  }, [])
 
   return (
     <div className="App">
-      {countries ? <Countries countries={countries} setSearchName={setSearchName}/> : <p>loading...</p>}
+      <input type='text' onChange={event => setSearchString(event.target.value)} />
+      {countries && countries
+        .filter(country => country.name.common.includes(searchString))
+        .map((country, index) => 
+          <div key={index}>{country.name.common}</div>
+        )
+      }
     </div>
   );
 }
